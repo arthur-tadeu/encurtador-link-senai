@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /links/{linkId} {
+      // Permitir leitura pública para que o redirecionamento funcione sem login
+      allow read: if true;
+      
+      // Permitir criação se o usuário estiver autenticado e o userId bater
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      
+      // Permitir atualização e exclusão apenas se o usuário for o dono do link
+      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+  }
+}
